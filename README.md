@@ -1,8 +1,25 @@
-# PhantomGate
+# PhantomGate — Cyber Deception Platform
 
-> AI-powered cyber deception platform with autonomous threat detection, LangGraph agent pipeline, and real-time monitoring dashboard.
+![Version](https://img.shields.io/badge/version-1.0.0-06b6d4) ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-06b6d4) ![React](https://img.shields.io/badge/React-18.3-06b6d4) ![License](https://img.shields.io/badge/license-MIT-06b6d4)
 
-PhantomGate is a production-grade cyber deception platform that deploys honey tokens across environments, detects unauthorized access, and autonomously responds via a multi-node AI reasoning pipeline.
+AI-powered cyber deception platform with autonomous threat detection, LangGraph agent pipeline, honey tokens, and real-time monitoring dashboard. Deploy fake credentials across environments and detect attackers the moment they touch them.
+
+## Quick Start
+
+```bash
+docker compose up -d
+```
+
+Open [http://localhost:3000](http://localhost:3000) and register a new account.
+
+## Features
+
+- **Honey Token Engine** — Deploy fake AWS keys, DB URLs, JWT secrets, and API tokens across environments
+- **Detection Engine** — Monitors token access and triggers alerts on unauthorized usage
+- **LangGraph AI Agent** — 5-node autonomous pipeline: enrichment, classification, severity scoring, report generation, response recommendation
+- **Real-Time Dashboard** — React 18 + TypeScript + Zustand with WebSocket streaming (zero polling)
+- **Incident Reporting** — Auto-generated natural language reports with full threat context
+- **Threat Scoring** — Severity and confidence-based risk assessment (0-100)
 
 ## Architecture
 
@@ -19,40 +36,33 @@ PhantomGate is a production-grade cyber deception platform that deploys honey to
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Key Features
-
-- **Honey Token Engine** — Deploy fake AWS keys, DB URLs, JWT secrets, and API tokens across environments
-- **Detection Engine** — Monitors token access and triggers alerts on unauthorized usage
-- **LangGraph AI Agent** — 5-node autonomous pipeline for threat enrichment, classification, severity scoring, report generation, and response recommendation
-- **Real-Time Dashboard** — React 18 + TypeScript + Zustand with WebSocket streaming (zero polling)
-- **Incident Reporting** — Auto-generated natural language reports with full threat context
-- **Hardened Security** — JWT auth, bcrypt hashing, security headers, rate limiting, OWASP Top 10 compliance
-
 ## Tech Stack
 
-| Layer        | Technology                                  |
-|-------------|---------------------------------------------|
-| Backend     | FastAPI + Python 3.12 + async SQLAlchemy    |
-| Frontend    | React 18 + TypeScript + Zustand             |
-| AI/Agent    | LangGraph + LangChain + GPT-4o              |
-| Database    | PostgreSQL + Redis                          |
-| Infra       | Docker Compose                              |
-| Auth        | JWT + bcrypt                                |
-| Realtime    | WebSockets                                  |
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python 3.12, FastAPI, SQLAlchemy (async), asyncpg |
+| Frontend | React 18, TypeScript, Vite, Zustand |
+| AI/Agent | LangGraph + LangChain |
+| Database | PostgreSQL 16 |
+| Cache | Redis 7 |
+| Auth | JWT (python-jose), bcrypt (passlib) |
+| Realtime | WebSockets |
+| Infra | Docker, Docker Compose, nginx |
 
-## Getting Started
+## API Endpoints
 
-```bash
-# Clone the repo
-git clone https://github.com/ab069/PhantomGate.git
-cd PhantomGate
-
-# Start all services
-docker compose up -d
-
-# Access the dashboard
-open http://localhost:3000
-```
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login, returns JWT |
+| POST | `/api/tokens` | Deploy a honey token |
+| GET | `/api/tokens` | List honey tokens |
+| GET | `/api/tokens/stats` | Token statistics |
+| GET | `/api/alerts` | List detection alerts |
+| GET | `/api/alerts/stats` | Alert statistics |
+| PATCH | `/api/alerts/{id}/status` | Update alert status |
+| WS | `/ws/{user_id}` | WebSocket real-time feed |
+| GET | `/api/health` | Health check |
 
 ## Project Structure
 
@@ -60,24 +70,41 @@ open http://localhost:3000
 PhantomGate/
 ├── backend/
 │   ├── app/
-│   │   ├── api/          # FastAPI routes
-│   │   ├── core/         # Config, security, dependencies
-│   │   ├── models/       # SQLAlchemy models
-│   │   ├── schemas/      # Pydantic schemas
-│   │   ├── services/     # Business logic
-│   │   └── agents/       # LangGraph agent pipeline
-│   ├── alembic/          # DB migrations
-│   └── tests/
+│   │   ├── core/        # Config, security, database, deps
+│   │   ├── models/      # SQLAlchemy models
+│   │   ├── schemas/     # Pydantic schemas
+│   │   ├── services/    # Business logic layer
+│   │   ├── agents/      # LangGraph agent pipeline
+│   │   ├── api/         # Route handlers
+│   │   └── main.py      # FastAPI app entrypoint
+│   ├── tests/           # Pytest test suite
+│   └── Dockerfile
 ├── frontend/
 │   ├── src/
-│   │   ├── components/   # React components
-│   │   ├── store/        # Zustand stores
-│   │   ├── hooks/        # Custom hooks
-│   │   └── pages/        # Route pages
-│   └── tests/
+│   │   ├── store/       # Zustand state stores
+│   │   ├── hooks/       # React hooks (WebSocket)
+│   │   ├── components/  # Reusable UI components
+│   │   ├── pages/       # Login, Register, Dashboard
+│   │   ├── main.tsx     # Entry point
+│   │   └── App.tsx      # Router
+│   ├── Dockerfile
+│   └── nginx.conf
 ├── docker-compose.yml
 └── README.md
 ```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | `postgresql+asyncpg://...` | PostgreSQL connection string |
+| `REDIS_URL` | `redis://redis:6379/0` | Redis connection string |
+| `SECRET_KEY` | `change-me-in-production` | JWT signing key |
+| `OPENAI_API_KEY` | _(optional)_ | OpenAI key for LangGraph agent |
+
+## Demo Credentials
+
+Register a new account at `/register` after starting the app.
 
 ## License
 
